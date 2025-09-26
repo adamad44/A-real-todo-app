@@ -1,0 +1,60 @@
+/* Reset and base styles */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	line-height: 1.6;
+	color: #333;
+	background-color: #f8f9fa;
+}
+
+/* App container */
+#app {
+	padding: 20px 0;
+}
+
+/* Card improvements */
+.card {
+	border-radius: 10px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	border: none;
+	margin-bottom: 1rem;
+}
+
+.card-body {
+	padding: 1.5rem;
+}
+
+/* Form responsive improvements */
+@media (max-width: 576px) {
+	.btn {
+		font-size: 0.875rem;
+	}
+
+	.card-body {
+		padding: 1rem;
+	}
+
+	h1 {
+		font-size: 1.75rem;
+	}
+}
+
+/* Range slider improvements */
+.form-range {
+	min-width: 100px;
+}
+
+/* Due date label improvements */
+.due-date-label {
+	min-height: 1.5rem;
+}
+
+/* Delete button improvements */
+.delete-btn {
+	min-width: 70px;
+}
