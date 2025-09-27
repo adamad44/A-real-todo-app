@@ -44,9 +44,21 @@ body {
 	}
 }
 
-/* Range slider improvements */
 .form-range {
 	min-width: 100px;
+	transition: all 0.3s ease;
+}
+
+.progress-container {
+	transition: all 0.4s ease;
+	border-radius: 8px;
+	padding: 0.5rem;
+}
+
+.percentage-display {
+	transition: all 0.3s ease;
+	border-radius: 4px;
+	padding: 0.25rem 0.5rem;
 }
 
 /* Due date label improvements */
