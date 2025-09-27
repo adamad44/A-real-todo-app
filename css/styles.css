@@ -1,72 +1,227 @@
-/* Reset and base styles */
 * {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
 }
-
+:root {
+	--bg: #f8f9fa;
+	--text: #222;
+	--muted: #6c757d;
+	--card-bg: #ffffff;
+	--card-border: #e5e7eb;
+	--accent: #0d6efd;
+	--accent-2: #20c997;
+	--success: #198754;
+	--danger: #dc3545;
+	--ring: rgba(13, 110, 253, 0.25);
+	--shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+	--badge-bg: #eef2ff;
+	--slider-track: #dfe3e8;
+	--slider-thumb: #0d6efd;
+}
 body {
-	font-family: Arial, sans-serif;
+	font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,
+		Inter, Arial, sans-serif;
 	line-height: 1.6;
-	color: #333;
-	background-color: #f8f9fa;
+	color: var(--text);
+	background: var(--bg);
+	transition: background-color 0.25s ease, color 0.25s ease;
 }
-
-/* App container */
+body.dark,
+body.dark-mode {
+	--bg: #0b0c0f;
+	--text: #e5e7eb;
+	--muted: #9aa3af;
+	--card-bg: #111318;
+	--card-border: #1f232b;
+	--accent: #60a5fa;
+	--accent-2: #34d399;
+	--success: #22c55e;
+	--danger: #f87171;
+	--ring: rgba(96, 165, 250, 0.35);
+	--shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+	--badge-bg: #111827;
+	--slider-track: #2b2f37;
+	--slider-thumb: #60a5fa;
+}
+.dark-mode-toggle {
+	position: fixed;
+	top: 16px;
+	right: 16px;
+	z-index: 1000;
+}
+#darkModeToggle {
+	width: 44px;
+	height: 44px;
+	border-radius: 999px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1rem;
+	border: 1px solid var(--card-border);
+	background: var(--card-bg);
+	color: var(--text);
+	transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease,
+		box-shadow 0.2s ease;
+	box-shadow: var(--shadow);
+}
+#darkModeToggle:hover {
+	transform: scale(1.05);
+	border-color: var(--accent);
+}
 #app {
-	padding: 20px 0;
+	padding: 24px 0;
 }
-
-/* Card improvements */
 .card {
-	border-radius: 10px;
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-	border: none;
-	margin-bottom: 1rem;
+	background: var(--card-bg);
+	border: 1px solid var(--card-border);
+	border-radius: 14px;
+	box-shadow: var(--shadow);
+	margin-bottom: 12px;
 }
-
 .card-body {
-	padding: 1.5rem;
+	padding: 20px;
 }
-
-/* Form responsive improvements */
+h1 {
+	color: var(--text);
+}
+.form-control {
+	background: var(--card-bg);
+	border: 1px solid var(--card-border);
+	color: var(--text);
+	transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.form-control:focus {
+	background: var(--card-bg);
+	border-color: var(--accent);
+	color: var(--text);
+	box-shadow: 0 0 0 0.25rem var(--ring);
+}
+.form-control::placeholder {
+	color: var(--muted);
+}
+.btn {
+	transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.btn:hover {
+	transform: translateY(-1px);
+}
+.btn-success {
+	background: var(--success);
+	border-color: var(--success);
+}
+.btn-outline-danger {
+	color: var(--danger);
+	border-color: var(--danger);
+}
+.btn-outline-danger:hover {
+	background: var(--danger);
+	color: #fff;
+}
+.btn-outline-primary {
+	color: var(--accent);
+	border-color: var(--accent);
+}
+.btn-outline-primary:hover {
+	background: var(--accent);
+	color: #fff;
+}
+.text-muted {
+	color: var(--muted) !important;
+}
+.todo-text,
+.completion-percentage,
+.form-label,
+label {
+	color: var(--text);
+}
+.due-date-label,
+.actual-due-date,
+small {
+	color: var(--muted) !important;
+}
+.slider-wrapper {
+	position: relative;
+}
+.form-range {
+	min-width: 120px;
+	appearance: none;
+	width: 100%;
+	height: 6px;
+	border-radius: 999px;
+	background: var(--slider-track);
+	outline: none;
+}
+.form-range::-webkit-slider-thumb {
+	appearance: none;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background: var(--slider-thumb);
+	cursor: pointer;
+	border: none;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+.form-range::-moz-range-thumb {
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background: var(--slider-thumb);
+	cursor: pointer;
+	border: none;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+.progress-container {
+	transition: all 0.25s ease;
+	border-radius: 10px;
+	padding: 0.5rem;
+	background: transparent;
+}
+.percentage-display {
+	transition: all 0.2s ease;
+	border-radius: 6px;
+	padding: 0.25rem 0.5rem;
+	background: var(--badge-bg);
+}
+.slider-value {
+	display: inline-block;
+	background: var(--badge-bg);
+	border: 1px solid var(--card-border);
+	color: var(--text);
+	border-radius: 6px;
+	padding: 0.125rem 0.5rem;
+}
+.delete-btn {
+	outline: 1px solid var(--danger);
+	outline: 1px solid color-mix(in oklab, var(--danger) 60%, #000 0%);
+	color: var(--danger);
+	margin-bottom: 8px;
+}
+.edit-btn {
+	outline: 1px solid var(--accent);
+	outline: 1px solid color-mix(in oklab, var(--accent) 60%, #000 0%);
+	color: var(--accent);
+}
 @media (max-width: 576px) {
 	.btn {
-		font-size: 0.875rem;
+		font-size: 0.9rem;
 	}
-
 	.card-body {
-		padding: 1rem;
+		padding: 16px;
 	}
-
 	h1 {
 		font-size: 1.75rem;
 	}
-}
-
-.form-range {
-	min-width: 100px;
-	transition: all 0.3s ease;
-}
-
-.progress-container {
-	transition: all 0.4s ease;
-	border-radius: 8px;
-	padding: 0.5rem;
-}
-
-.percentage-display {
-	transition: all 0.3s ease;
-	border-radius: 4px;
-	padding: 0.25rem 0.5rem;
-}
-
-/* Due date label improvements */
-.due-date-label {
-	min-height: 1.5rem;
-}
-
-/* Delete button improvements */
-.delete-btn {
-	min-width: 70px;
+	body {
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+	#app {
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+	.container-fluid {
+		padding-left: 16px !important;
+		padding-right: 16px !important;
+	}
 }

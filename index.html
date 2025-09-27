@@ -14,13 +14,19 @@
 		<link rel="stylesheet" href="css/styles.css" />
 	</head>
 	<body>
+		<div class="dark-mode-toggle">
+			<button id="darkModeToggle" class="btn btn-outline-secondary btn-sm">
+				<span class="dark-mode-icon">🌙</span>
+			</button>
+		</div>
+
 		<div id="app" class="container-fluid">
 			<div class="row justify-content-center">
 				<div class="col-12 col-md-10 col-lg-8 col-xl-6">
 					<h1 class="text-center mb-4">Todos</h1>
 					<div id="new-item-container" class="mb-4">
-						<form id="todo-form" class="row g-2">
-							<div class="col-12 col-sm-6">
+						<form id="todo-form" class="row g-3">
+							<div class="col-12 col-sm-4">
 								<input
 									type="text"
 									id="new-item-input"
@@ -29,8 +35,25 @@
 									required
 								/>
 							</div>
-							<div class="col-12 col-sm-4">
+							<div class="col-12 col-sm-3">
 								<input type="date" id="new-item-date" class="form-control" required />
+							</div>
+							<div class="col-12 col-sm-3">
+								<div class="slider-wrapper">
+									<input
+										type="range"
+										id="difficulty-slider"
+										class="form-range difficulty-slider"
+										min="1"
+										max="10"
+										value="1"
+										aria-label="Difficulty"
+										oninput="document.getElementById('difficulty-label').innerText = 'Effort: ' + this.value + '/10';"
+									/>
+									<div class="slider-value-container">
+										<span id="difficulty-label" class="slider-value">Effort: 1/10</span>
+									</div>
+								</div>
 							</div>
 							<div class="col-12 col-sm-2">
 								<button type="submit" class="btn btn-success w-100">Add</button>

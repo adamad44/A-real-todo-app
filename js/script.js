@@ -3,6 +3,27 @@ document.addEventListener("DOMContentLoaded", function () {
 	const newItemInput = document.getElementById("new-item-input");
 	const itemsContainer = document.getElementById("items-container");
 
+	const darkModeToggle = document.getElementById("darkModeToggle");
+	const darkModeIcon = document.querySelector(".dark-mode-icon");
+
+	const savedDarkMode = localStorage.getItem("darkMode");
+	if (savedDarkMode === "enabled") {
+		document.body.classList.add("dark-mode");
+		darkModeIcon.textContent = "☀️";
+	}
+
+	darkModeToggle.addEventListener("click", function () {
+		document.body.classList.toggle("dark-mode");
+
+		if (document.body.classList.contains("dark-mode")) {
+			localStorage.setItem("darkMode", "enabled");
+			darkModeIcon.textContent = "☀️";
+		} else {
+			localStorage.setItem("darkMode", "disabled");
+			darkModeIcon.textContent = "🌙";
+		}
+	});
+
 	todoForm.addEventListener("submit", function (event) {
 		event.preventDefault();
 
@@ -56,32 +77,34 @@ document.addEventListener("DOMContentLoaded", function () {
 			today.setHours(0, 0, 0, 0);
 
 			const aDueDate = a.dueDate ? new Date(a.dueDate + "T00:00:00") : null;
-			const bDueDate = b.dueDate ? new Date(b.dueDate + "T00:00:00") : null;
-
 			const aDaysUntilDue = aDueDate
 				? Math.ceil((aDueDate - today) / (1000 * 60 * 60 * 24))
-				: null;
+				: 999;
+
+			const aDaysPressureFactor = Math.max(1, 5 - aDaysUntilDue) / 5;
+			const aEffortFactor = (a.effort || 1) / 10;
+			const aRemainingWorkFactor = (100 - (a.percentage || 0)) / 100;
+			const aPriorityScore =
+				aDaysPressureFactor * aEffortFactor * aRemainingWorkFactor;
+
+			const bDueDate = b.dueDate ? new Date(b.dueDate + "T00:00:00") : null;
 			const bDaysUntilDue = bDueDate
 				? Math.ceil((bDueDate - today) / (1000 * 60 * 60 * 24))
-				: null;
+				: 999;
 
-			const aRemainingWork = 100 - (a.percentage || 0);
-			const bRemainingWork = 100 - (b.percentage || 0);
+			const bDaysPressureFactor = Math.max(1, 5 - bDaysUntilDue) / 5;
+			const bEffortFactor = (b.effort || 1) / 10;
+			const bRemainingWorkFactor = (100 - (b.percentage || 0)) / 100;
+			const bPriorityScore =
+				bDaysPressureFactor * bEffortFactor * bRemainingWorkFactor;
 
-			const aRecommendedCompletion =
-				aDaysUntilDue > 1
-					? Math.ceil(aRemainingWork / (aDaysUntilDue - 1))
-					: aRemainingWork;
-			const bRecommendedCompletion =
-				bDaysUntilDue > 1
-					? Math.ceil(bRemainingWork / (bDaysUntilDue - 1))
-					: bRemainingWork;
-
-			return (bRecommendedCompletion || 0) - (aRecommendedCompletion || 0);
+			return bPriorityScore - aPriorityScore;
 		});
 
 		items.forEach(function (item) {
 			if (item && item.id && item.text) {
+				console.log(item.effort);
+
 				addTodoItem(item.text, item.percentage || 0, false, item.id, item.dueDate);
 			}
 		});
@@ -92,7 +115,8 @@ document.addEventListener("DOMContentLoaded", function () {
 		savedPercentage = 0,
 		saveToStorage = true,
 		existingId = null,
-		storedDueDate = null
+		storedDueDate = null,
+		effortValue = null
 	) {
 		let actualDueDate = storedDueDate;
 		if (!actualDueDate && saveToStorage) {
@@ -161,8 +185,8 @@ document.addEventListener("DOMContentLoaded", function () {
 								}</small>
 							</div>
 							<div class="col-12 col-sm-2 col-md-3">
-								<button class="btn btn-sm btn-outline-danger delete-btn w-100" id="${uniqueId}">Delete</button>
-								<button class="btn btn-sm btn-outline-primary edit-btn w-100 mt-2 mt-sm-0">Edit</button>
+								<button class="btn btn-sm delete-btn w-100" id="${uniqueId}">Delete</button>
+								<button class="btn btn-sm edit-btn w-100 mt-2 mt-sm-0">Edit</button>
 							</div>
 						</div>
 					</div>
@@ -173,6 +197,11 @@ document.addEventListener("DOMContentLoaded", function () {
 		const rangeInput = todoItem.querySelector(".form-range");
 		const percentageDisplay = todoItem.querySelector(".completion-percentage");
 		const progressContainer = todoItem.querySelector(".progress-container");
+
+		if (saveToStorage) {
+			const effortValueInput = document.getElementById("difficulty-slider");
+			effortValue = effortValueInput ? effortValueInput.value : 1;
+		}
 
 		function updateProgressGlow(percentage) {
 			const intensity = percentage / 100;
@@ -201,6 +230,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				text: text,
 				percentage: rangeInput.value,
 				dueDate: actualDueDate,
+				effort: effortValue,
 			};
 			localStorage.setItem(uniqueId, JSON.stringify(itemIdentifier));
 		}
@@ -233,12 +263,21 @@ document.addEventListener("DOMContentLoaded", function () {
 					dueDateLabel.textContent = newDueDateText;
 				}
 			}
+			const newEffortValue = prompt(
+				"Edit the effort value (1-10):",
+				effortValue || 1
+			);
+
+			if (newEffortValue !== null && !isNaN(newEffortValue)) {
+				effortValue = Math.max(1, Math.min(10, parseInt(newEffortValue, 10)));
+			}
 
 			const updatedItem = {
 				id: uniqueId,
 				text: text,
 				percentage: rangeInput.value,
 				dueDate: actualDueDate,
+				effort: effortValue,
 			};
 			localStorage.setItem(uniqueId, JSON.stringify(updatedItem));
 		});
@@ -251,6 +290,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				text: text,
 				percentage: rangeInput.value,
 				dueDate: actualDueDate,
+				effort: effortValue,
 			};
 			localStorage.setItem(uniqueId, JSON.stringify(updatedItem));
 		});
