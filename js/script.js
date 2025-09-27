@@ -9,13 +9,37 @@ document.addEventListener("DOMContentLoaded", function () {
 		const newItemText = newItemInput.value.trim();
 
 		if (newItemText !== "") {
-			addTodoItem(newItemText, null, true); // true means save to localStorage
+			addTodoItem(newItemText, null, true);
 			newItemInput.value = "";
 		}
 	});
 
-	// Load saved items from localStorage on page load
 	loadSavedItems();
+
+	function calculateDueDateText(dateString) {
+		if (!dateString) return "";
+
+		const dueDate = new Date(dateString);
+		const today = new Date();
+
+		today.setHours(0, 0, 0, 0);
+		dueDate.setHours(0, 0, 0, 0);
+
+		const timeDiff = dueDate - today;
+		const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+		if (daysDiff < 0) {
+			return `Overdue by ${Math.abs(daysDiff)} day${
+				Math.abs(daysDiff) === 1 ? "" : "s"
+			}`;
+		} else if (daysDiff === 0) {
+			return "Due today";
+		} else if (daysDiff === 1) {
+			return "Due tomorrow";
+		} else {
+			return `Due in ${daysDiff} days`;
+		}
+	}
 
 	function loadSavedItems() {
 		itemsContainer.innerHTML = "";
@@ -24,7 +48,8 @@ document.addEventListener("DOMContentLoaded", function () {
 			if (key.startsWith("slider-")) {
 				const item = JSON.parse(localStorage.getItem(key));
 				if (item && item.id && item.text) {
-					addTodoItem(item.text, item.percentage || 0, false, item.id, item.dueDate); // pass the original ID
+					const dueDateText = calculateDueDateText(item.dueDate);
+					addTodoItem(item.text, item.percentage || 0, false, item.id, item.dueDate);
 				}
 			}
 		});
@@ -35,23 +60,15 @@ document.addEventListener("DOMContentLoaded", function () {
 		savedPercentage = 0,
 		saveToStorage = true,
 		existingId = null,
-		dueDateText = null
+		storedDueDate = null
 	) {
-		const dueDateElement = document.getElementById("new-item-date");
-		const dueDateInput = dueDateElement ? dueDateElement.value : null;
-
-		if (dueDateInput) {
-			const dueDateObj = new Date(dueDateInput);
-			const today = new Date();
-			const timeDiff = dueDateObj - today;
-			const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-
-			if (daysDiff === 1) {
-				dueDateText = "Due tomorrow";
-			} else if (daysDiff > 1) {
-				dueDateText = `Due in ${daysDiff} days`;
-			}
+		let actualDueDate = storedDueDate;
+		if (!actualDueDate && saveToStorage) {
+			const dueDateElement = document.getElementById("new-item-date");
+			actualDueDate = dueDateElement ? dueDateElement.value : null;
 		}
+
+		const dueDateText = calculateDueDateText(actualDueDate);
 
 		const todoItem = document.createElement("div");
 		todoItem.className = "card mb-2";
@@ -94,27 +111,11 @@ document.addEventListener("DOMContentLoaded", function () {
 		});
 
 		if (saveToStorage) {
-			const dueDateElement = document.getElementById("new-item-date");
-			const dueDateInput = dueDateElement ? dueDateElement.value : null;
-
-			if (dueDateInput) {
-				const dueDateObj = new Date(dueDateInput);
-				const today = new Date();
-				const timeDiff = dueDateObj - today;
-				const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-
-				if (daysDiff === 1) {
-					dueDateText = "Due tomorrow";
-				} else if (daysDiff > 1) {
-					dueDateText = `Due in ${daysDiff} days`;
-				}
-			}
-
 			const itemIdentifier = {
 				id: uniqueId,
 				text: text,
 				percentage: rangeInput.value,
-				dueDate: dueDateText,
+				dueDate: actualDueDate,
 			};
 			localStorage.setItem(uniqueId, JSON.stringify(itemIdentifier));
 		}
@@ -137,23 +138,14 @@ document.addEventListener("DOMContentLoaded", function () {
 			}
 			const newDueDate = prompt(
 				"Edit the due date (YYYY-MM-DD):",
-				dueDateText ? dueDateText : ""
+				actualDueDate || ""
 			);
 			if (newDueDate) {
 				const dueDateObj = new Date(newDueDate);
 				if (!isNaN(dueDateObj)) {
-					const today = new Date();
-					const timeDiff = dueDateObj - today;
-					const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-
-					if (daysDiff === 1) {
-						dueDateText = "Due tomorrow";
-					} else if (daysDiff > 1) {
-						dueDateText = `Due in ${daysDiff} days`;
-					} else {
-						dueDateText = "Due today";
-					}
-					dueDateLabel.textContent = dueDateText;
+					actualDueDate = newDueDate;
+					const newDueDateText = calculateDueDateText(actualDueDate);
+					dueDateLabel.textContent = newDueDateText;
 				}
 			}
 
@@ -161,7 +153,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				id: uniqueId,
 				text: text,
 				percentage: rangeInput.value,
-				dueDate: dueDateText,
+				dueDate: actualDueDate,
 			};
 			localStorage.setItem(uniqueId, JSON.stringify(updatedItem));
 		});
@@ -173,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				id: uniqueId,
 				text: text,
 				percentage: rangeInput.value,
-				dueDate: dueDateText,
+				dueDate: actualDueDate,
 			};
 			localStorage.setItem(uniqueId, JSON.stringify(updatedItem));
 		});
